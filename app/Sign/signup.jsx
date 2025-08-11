@@ -13,32 +13,36 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onSignup = () => {
-    if (!email || !password || !name) {
-      Alert.alert('Enter all field values');
-      return;
-    }
+  const onSignup = async () => {
+  if (!email || !password || !name) {
+    Alert.alert('Enter all field values');
+    return;
+  }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-        // ذخیره اطلاعات یوزر در Firestore
-        await setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
-          name: name,
-          email: user.email,
-          createdAt: new Date(),
-        });
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      name: name,
+      email: user.email,
+      createdAt: new Date(),
+      familySize: null,
+      mealsPerWeek: null,
+      mealTypes: [],
+      profileCompleted: false
+    });
 
-        Alert.alert('Signup successful!');
-        console.log('User saved:', user.uid);
-      })
-      .catch((error) => {
-        Alert.alert('Signup failed');
-        console.log('Error:', error.message);
-      });
-  };
+    Alert.alert('Signup successful!');
+    console.log('User saved:', user.uid);
+
+  } catch (error) {
+    Alert.alert('Signup failed');
+    console.log('Error:', error.message);
+  }
+};
+
 
   return (
     <View style={{
